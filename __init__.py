@@ -34,4 +34,5 @@ class XlsXtractor(object):
         """
         return xlrd_util.CellBlock(self._workbook, sheet_id)
         
-    def _compute_row_scores(
+    def _compute_row_scores():
+        pass
