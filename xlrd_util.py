@@ -91,7 +91,7 @@ class CellBlock(object):
     
     def mark_merged_cells(merged_cells):
         """ Mark merged cells, copy value from top-left cell to 
-            others in merged area
+        others in merged area
         """
         for crange in merged_cells:
             rlo, rhi, clo, chi = crange
