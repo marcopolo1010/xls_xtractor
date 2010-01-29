@@ -169,12 +169,11 @@ class XlsXtractor(object):
                     row_scores[row] = metadata_scores[row]
             else:
                 #schema_score = calculate_schema_score(cells[row], current_block)
-                if empty[row] and empty.get(row + 1, 0):
+                if empty[row] and empty.get(row + 1, 0) and empty.get(row + 2, 0):
                     in_block = False
                 elif header_scores[row] > 1.0 and similarity_scores[row] < .8:
                     row_scores[row] = header_scores[row]
                     labels[row] = 'HEADER'
-                    in_block = False
 #                elif len(current_block['data_rows']) > 2: # and schema_score < .25:
 #                    labels[row] = 'METADATA'
 #                    row_scores[row] = metadata_scores[row]
