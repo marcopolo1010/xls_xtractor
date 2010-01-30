@@ -35,7 +35,7 @@ def load_file(filename):
             raise
         return
     except AssertionError:
-        print 'Error in XLS parsing library, file could not be opened.'
+        print 'Error raised in XLS parsing library, file could not be opened.'
         return
     return workbook
 
@@ -64,7 +64,7 @@ class CellBlock(object):
         format_map = workbook.format_map
         format_map_str = {}
         for k in format_map:
-            format_map_str[k] = ('%s' % format_map[k].format_str).encode('utf8')
+            format_map_str[k] = format_map[k].format_str.encode('utf8')
         
         for row_index in range(sheet.nrows):
             cells.append([None]*sheet.ncols)
@@ -76,7 +76,7 @@ class CellBlock(object):
                 try:
                     cell_value_str = str(cell_value)
                 except:
-                    cell_value_str = ('%s' % cell_value).encode('utf8')
+                    cell_value_str = cell_value.encode('utf8')
                     
                 cell_type = CELL_TYPE_LOOKUP[c.ctype]
                 cell_xf = xf_list[c.xf_index]
@@ -97,6 +97,7 @@ class CellBlock(object):
                 current_cell['style'] = cell_style
                 current_cell['format_str'] = cell_format_str
                 current_cell['merged'] = 0
+                current_cell['empty'] = check_for_empty_cell(current_cell)
                 
                 cells[row_index][col_index] = current_cell
                 
@@ -144,15 +145,24 @@ def check_for_empty_row(cellblock, row_index):
     return 1
     
 def check_for_numeric_cell(c):
+    """ Return a score that represents the numeric "strength" of a cell.
+    
+    0.0 = Definitely not a number (text, etc)
+    0.5 = Blank, a number that looks like a year, etc
+    1.0 = Definitely a numeric quantity
+    """
     score = 0.0
     
     if check_for_empty_cell(c):
-        return 1.0
+        return 0.5
     
     if (c['type'] != 'NUMBER' or
-        re_year.match(c['value_str'])):
+        re_year.search(c['value_str'])):
         score -= 1
-        
+    
+    if c['type'] == 'NUMBER':
+        score += 1.5
+    
     # add 2 if we see currencies, percentages, or numbers
     if (re_fmt.search(c['format_str']) and
         re_num.search(c['value_str']) and
