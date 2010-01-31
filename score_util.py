@@ -2,7 +2,7 @@ from xls_xtractor.xlrd_util import (check_for_empty_row,
                                     check_for_numeric_cell)
 
 #***************************************
-#
+# The following functions calculate estimated 
 #
 def compute_row_scores(sheetinfo):
     """Computes "probability" that each row is byline, header, or data."""
@@ -141,23 +141,28 @@ def calc_sim_score(cellblock, row, next_row):
 def calc_header_score(cellblock, row, next_row):
 
     score = 0.0
-    col_count = len(cellblock.col_list)
+    col_list = cellblock.col_list
+    col_count = len(col_list)
     
     cells = cellblock.cells
     
     use_previous = 0
     header_text = {}
     
-    for i, col in enumerate(cellblock.col_list):
-        prev_col = next_col = -1
+    for i, col in enumerate(col_list):
         
-        if i > 0:
-            prev_col = cellblock.col_list[i-1]
-        if i + 1 < col_count:
-            next_col = cellblock.col_list[i+1]
+        try:
+            prev_col = col_list[i-1]
+        except:
+            prev_col = -1
         
-        c1 = cellblock.cells[row][col]
-        c2 = cellblock.cells[next_row][col]
+        try:
+            next_col = col_list[i+1]
+        except:
+            prev_col = -1            
+        
+        c1 = cells[row][col]
+        c2 = cells[next_row][col]
 
         # Key ideas: schema should be complete
         # An empty cell should be filled by rows above
@@ -198,11 +203,7 @@ def calc_header_score(cellblock, row, next_row):
                 
             else:
                 score -= 4
-                
-        elif (row == 0 and prev_col >= 0 and
-              cells[row][col]['value'] == cells[row][prev_col]['value']):
-            score -= 5
-            
+           
         else:
             score += 1
         
@@ -324,4 +325,14 @@ def dumb_classify(sheetinfo):
     sheetinfo['scores']['row_scores'] = row_scores
 
 def smart_classify(sheet_info):
-    pass
+    return
+    labels = sheetinfo['labels']
+    scores = sheetinfo['scores']
+    empty = scores['empty']
+    metadata_scores = scores['metadata']
+    header_scores = scores['header']
+    similarity_scores = scores['similarity']
+    
+    
+#    for row in sheetinfo['cellblock'].row_list:
+#        if labels[row] 

@@ -3,7 +3,7 @@
 # 2010-01-25 mda     Copied logic from original project files.
 # 2010-01-25 mda     Created file.
 
-import xlrd_util, score_util, show_schema
+import xlrd_util, score_util#, show_schema
 
 class XlsXtractor(object):
     workbook = None
